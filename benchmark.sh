@@ -5,7 +5,7 @@ max_cores=$(nproc)
 runs=1
 iterations=20
 # Parse command line arguments
-while getopts ":hc:o:p:r:i:" opt; do
+while getopts ":hc:o:p:r:i:m:" opt; do
   case $opt in
     h)
       echo "Usage: $0 [-h] [-c max_cores] [-p benchmark_dir]"
@@ -34,6 +34,9 @@ while getopts ":hc:o:p:r:i:" opt; do
       ;;
     i)
       iterations=$OPTARG
+      ;;
+    m)
+      measure=$OPTARG
       ;;
      \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -72,8 +75,12 @@ for benchmark in $benchmark_dir/*; do
     for (( j = 1 ; j <= $runs ; j++ )); do
       # Run the benchmark and save the output to a file
       hostname=$(hostname)
-      output_file="${results_dir}/$hostname-${benchmark##*/}-$cores-$j.txt"
-      OMP_NUM_THREADS=$cores $benchmark --raw-data --outer-repetitions $iterations > $output_file
+      output_file="${results_dir}/$hostname-${benchmark##*/}-$cores-$j-$iterations.txt"
+      if [ -z "$measure" ]; then
+	OMP_NUM_THREADS=$cores $benchmark --raw-data --outer-repetitions $iterations > $output_file
+      else
+	OMP_NUM_THREADS=$cores $benchmark --raw-data --outer-repetitions $iterations --measureonly $measure > $output_file
+      fi
       echo "Benchmark $benchmark with $cores cores: output written to $output_file"
     done
   done

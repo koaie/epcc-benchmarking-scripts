@@ -16,7 +16,7 @@ command=""
 scommand="srun --distribution=block:block --hint=nomultithread"
 scripts_dir="/work/ta114/ta114/koa/scripts"
 
-while getopts ":hc:o:p:r:i:n:" opt; do
+while getopts ":hc:o:p:r:i:n:m:" opt; do
   case $opt in
     h)
       echo "Usage: $0 [-h] [-c max_cores] [-p benchmark_dir]"
@@ -53,6 +53,9 @@ while getopts ":hc:o:p:r:i:n:" opt; do
       ;;
     i)
       command="${command} -i $OPTARG"
+      ;;
+    m)
+      command="${command} -m $OPTARG"
       ;;
      \?)
       echo "Invalid option: -$OPTARG" >&2
